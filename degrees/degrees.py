@@ -92,41 +92,87 @@ def shortest_path(source, target): #this function utilizes breadth first search 
     If no possible path, returns None.
     """
     # Check if source and target are the same
+    wichone = 3
     if source == target:
         return []
 
     # Initialize the frontier with the starting position
-    start = Node(state=source, parent=None, action=None)
-    frontier = QueueFrontier()
-    frontier.add(start)
 
     # Keeping track of explored nodes to avoid cycles
     explored = set()
 
     # Loop
-    while not frontier.empty():
-        
-        node = frontier.remove()
-        explored.add(node.state)
+    match wichone:
+        case 1:
+            start = Node(state=source, parent=None, action=None)
+            frontier = StackFrontier()
+            frontier.add(start)
+            while not frontier.empty():
 
-        for movie_id, person_id in neighbors_for_person(node.state):
-            
-            if not frontier.contains_state(person_id) and person_id not in explored:
-                child = Node(state=person_id, parent=node, action=movie_id)
+                node = frontier.remove()
+                explored.add(node.state)
 
-                if person_id == target:
-                    path = []
-                    curr = child
+                for movie_id, person_id in neighbors_for_person(node.state):
+
+                    if not frontier.contains_state(person_id) and person_id not in explored:
+                        child = Node(state=person_id, parent=node, action=movie_id)
+
+                        if person_id == target:
+                            path = []
+                            curr = child
+                            
+                            while curr.parent is not None:
+                                path.append((curr.action, curr.state))
+                                curr = curr.parent
+                            path.reverse()
+                            return path
+
+                        frontier.add(child)
+
+            return None
+        case 2:
+            start = Node(state=source, parent=None, action=None)
+            frontier = QueueFrontier()
+            frontier.add(start)
+            while not frontier.empty():
+                
+                node = frontier.remove()
+                explored.add(node.state)
+
+                for movie_id, person_id in neighbors_for_person(node.state):
                     
-                    while curr.parent is not None:
-                        path.append((curr.action, curr.state))
-                        curr = curr.parent
-                    path.reverse()
-                    return path
+                    if not frontier.contains_state(person_id) and person_id not in explored:
+                        child = Node(state=person_id, parent=node, action=movie_id)
 
-                frontier.add(child)
+                        if person_id == target:
+                            path = []
+                            curr = child
+                            
+                            while curr.parent is not None:
+                                path.append((curr.action, curr.state))
+                                curr = curr.parent
+                            path.reverse()
+                            return path
 
-    return None
+                        frontier.add(child)
+
+            return None
+        case 3:
+            parents_src = {source: None}
+            parents_tgt = {target: None}
+
+            layer_src = [source]
+            layer_tgt = [target]
+
+            while layer_src and layer_tgt:
+                if len(layer_src) <= len(layer_tgt):
+                    layer_src, meet = expand_layer(layer_src, parents_src, parents_tgt)
+                else:
+                    layer_tgt, meet = expand_layer(layer_tgt, parents_tgt, parents_src)
+
+                if meet is not None:
+                    return build_path(meet, parents_src, parents_tgt)
+            return None
 
 
 def person_id_for_name(name):
@@ -167,6 +213,37 @@ def neighbors_for_person(person_id):
             neighbors.add((movie_id, person_id))
     return neighbors
 
+
+def expand_layer(layer, parents, other_parents):
+    next_layer = []
+    for person in layer:
+        for movie_id, neighbor in neighbors_for_person(person):
+            if neighbor in parents:
+                continue
+            parents[neighbor] = (person, movie_id)
+            if neighbor in other_parents:
+                return next_layer, neighbor
+            next_layer.append(neighbor)
+    return next_layer, None
+
+
+def build_path(meet, parents_src, parents_tgt):
+    path = []
+
+    person = meet
+    while parents_src[person] is not None:
+        prev, movie_id = parents_src[person]
+        path.append((movie_id, person))
+        person = prev
+    path.reverse()
+
+    person = meet
+    while parents_tgt[person] is not None:
+        nxt, movie_id = parents_tgt[person]
+        path.append((movie_id, nxt))
+        person = nxt
+
+    return path
 
 if __name__ == "__main__":
     main()
