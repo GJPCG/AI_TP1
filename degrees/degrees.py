@@ -84,7 +84,7 @@ def main():
             print(f"{i + 1}: {person1} and {person2} starred in {movie}")
 
 
-def shortest_path(source, target): #this function utilizes breadth first search (BFS)
+def shortest_path(source, target): # This function utilizes Depth first search (BFS)
     """
     Returns the shortest list of (movie_id, person_id) pairs
     that connect the source to the target.
