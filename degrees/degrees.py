@@ -84,49 +84,16 @@ def main():
             print(f"{i + 1}: {person1} and {person2} starred in {movie}")
 
 
-def shortest_path(source, target): #this function utilizes breadth first search (BFS)
+def shortest_path(source, target):
     """
     Returns the shortest list of (movie_id, person_id) pairs
     that connect the source to the target.
 
     If no possible path, returns None.
     """
-    # Check if source and target are the same
-    if source == target:
-        return []
 
-    # Initialize the frontier with the starting position
-    start = Node(state=source, parent=None, action=None)
-    frontier = QueueFrontier()
-    frontier.add(start)
-
-    # Keeping track of explored nodes to avoid cycles
-    explored = set()
-
-    # Loop
-    while not frontier.empty():
-        
-        node = frontier.remove()
-        explored.add(node.state)
-
-        for movie_id, person_id in neighbors_for_person(node.state):
-            
-            if not frontier.contains_state(person_id) and person_id not in explored:
-                child = Node(state=person_id, parent=node, action=movie_id)
-
-                if person_id == target:
-                    path = []
-                    curr = child
-                    
-                    while curr.parent is not None:
-                        path.append((curr.action, curr.state))
-                        curr = curr.parent
-                    path.reverse()
-                    return path
-
-                frontier.add(child)
-
-    return None
+    # TODO
+    raise NotImplementedError
 
 
 def person_id_for_name(name):
