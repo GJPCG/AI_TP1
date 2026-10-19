@@ -84,7 +84,8 @@ def main():
             print(f"{i + 1}: {person1} and {person2} starred in {movie}")
 
 
-def shortest_path(source, target): # This function utilizes breadth first search (BFS)
+def shortest_path(source, target): 
+    # This function utilizes breadth first search (BFS)
     """
     Returns the shortest list of (movie_id, person_id) pairs
     that connect the source to the target.
@@ -105,28 +106,34 @@ def shortest_path(source, target): # This function utilizes breadth first search
 
     # Loop
     while not frontier.empty():
-        
-        node = frontier.remove()
-        explored.add(node.state)
+        # Remove a node from the frontier
+        node = frontier.remove() 
+        # Mark the node as explored
+        explored.add(node.state) 
 
         for movie_id, person_id in neighbors_for_person(node.state):
-            
-            if not frontier.contains_state(person_id) and person_id not in explored:
-                child = Node(state=person_id, parent=node, action=movie_id)
+            # Check if the neighbor has not been explored or is not in the frontier
+            if not frontier.contains_state(person_id) and person_id not in explored: 
+                # Create a child node for the neighbor
+                child = Node(state=person_id, parent=node, action=movie_id) 
 
-                if person_id == target:
+                # If the neighbor is the target, we have found a solution
+                if person_id == target: 
                     path = []
                     curr = child
-                    
-                    while curr.parent is not None:
+
+                    # Backtrack to find the path from the source to the target
+                    while curr.parent is not None: 
                         path.append((curr.action, curr.state))
                         curr = curr.parent
                     path.reverse()
                     return path
 
-                frontier.add(child)
+                # Add the child node to the frontier
+                frontier.add(child) 
 
-    return None
+    # If the frontier is empty and no solution was found, return None
+    return None 
 
 
 def person_id_for_name(name):
